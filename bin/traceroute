@@ -1,6 +1,13 @@
 #!/bin/bash
-# This script is to run a
-#connection check to you
-
-#
-traceroute
+# traceroute - runs the system traceroute (this script shares its name, so it
+# must call the real one by path, not by name, or it would call itself forever).
+# With no address it asks for one, like trcerte.
+real=""
+for p in /usr/bin/traceroute /usr/sbin/traceroute /bin/traceroute; do [ -x "$p" ] && { real="$p"; break; }; done
+[ -z "$real" ] && { echo "traceroute isn't installed: sudo apt install traceroute"; exit 1; }
+if [ $# -eq 0 ]; then
+  read -rp "Address to trace: " target
+  [ -z "$target" ] && exit 1
+  set -- "$target"
+fi
+exec "$real" "$@"

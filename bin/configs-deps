@@ -37,7 +37,8 @@ missing=()
 echo "Checking what the configs scripts need..."
 while IFS=: read -r cmd pkg used; do
   [ -z "$cmd" ] && continue
-  if command -v "$cmd" >/dev/null 2>&1; then printf '  ok       %-12s\n' "$cmd"
+  if [ "$cmd" = traceroute ]; then found=$(ls /usr/bin/traceroute /usr/sbin/traceroute 2>/dev/null | head -1); else found=$(command -v "$cmd" 2>/dev/null); fi
+  if [ -n "$found" ]; then printf '  ok       %-12s\n' "$cmd"
   else printf '  MISSING  %-12s (apt: %s)  used by: %s\n' "$cmd" "$pkg" "$used"; missing+=("$pkg"); fi
 done <<< "$CMDS"
 while IFS=: read -r mod pkg used; do
