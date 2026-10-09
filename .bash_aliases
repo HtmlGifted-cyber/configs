@@ -1,3 +1,4 @@
+
 ##################################################
 # Automatically inputs aliases here in		 #
 # '.bash_aliases'				 #
@@ -60,6 +61,50 @@ if [ -d "$1" ]; then
 fi
 }
 
+##These are terminal quick commands
+## Display all aliases ##
+alias a='alias'
+
+##display history alais
+alias h='history'
+
+## Update and upgrade ##
+alias update='sudo apt-get update'
+alias upgrade='sudo apt-get upgrade'
+
+## cleaning commands ##
+alias autoclean='sudo apt-get autoclean'
+alias clean='sudo apt-get clean'
+
+## remove packages no longer needed ##
+alias remove='sudo apt-get autoremove'
+
+## check apt-cache size ##
+alias cache='du -sh /var/cache/apt/archives'
+
+## run the configure command
+alias config='sudo dpkg --configure -a'
+
+## run the fix issue command
+alias fix='sudo apt-get install -f'
+
+## shorten the install command ##
+alias install='sudo apt-get install'
+
+## find duplicate files in a directory
+#alias findd='rdfind'
+
+## ls ##
+alias ls='ls -hF --group-directories-first --color=auto'
+alias lr='ls -R'                    # recursive ls
+alias ll='ls -l'
+alias la='ll -A'
+alias lx='ll -BX'                   # sort by extension
+alias lz='ll -rS'                   # sort by size
+alias lt='ll -rt'                   # sort by date
+alias lm='la | more'
+
+
 ## Safety features ##
 alias cp='cp -i'
 alias mv='mv -i'
@@ -93,68 +138,18 @@ alias y='yaourt -Syy'
 alias ys='yaourt -Ss'
 alias yi='yaourt -Si'
 
-# '[r]emove [o]rphans'
-alias pacro="pacman -Qtdq > /dev/null && sudo pacman -Rs \$(pacman -Qtdq | sed -e ':a;N;$!ba;s/\n/ /g')"
-
-
-## ls ##
-alias ls='ls -hF --group-directories-first --color=auto'
-alias lr='ls -R'                    # recursive ls
-alias ll='ls -l'
-alias la='ll -A'
-alias lx='ll -BX'                   # sort by extension
-alias lz='ll -rS'                   # sort by size
-alias lt='ll -rt'                   # sort by date
-alias lm='la | more'
-
-# cd and ls in one
-cl() {
-if [ -d "$1" ]; then
-	cd "$1"
-	ls
-	else
-	echo "bash: cl: '$1': Directory not found"
-fi
-}
-
-## Safety features ##
-alias cp='cp -i'
-alias mv='mv -i'
-alias rm='rm -I'  # 'rm -i' prompts for every file
-# safer alternative w/ timeout, not stored in history
-#alias rm=' timeout 3 rm -Iv --one-file-system'
-alias ln='ln -i'
-alias chown='chown --preserve-root'
-alias chmod='chmod --preserve-root'
-alias chgrp='chgrp --preserve-root'
-alias cls=' echo -ne "\033c"'  # clear screen for real (it does not work in Terminology)
-
-## Make Bash error tollerant ##
-alias :q=' exit'
-alias :Q=' exit'
-alias :x=' exit'
-alias cd..='cd ..'
+#autoremove command
+alias autoremove='sudo apt autoremove'
 
 # '[r]emove [o]rphans'
 alias pacro="pacman -Qtdq > /dev/null && sudo pacman -Rs \$(pacman -Qtdq | sed -e ':a;N;$!ba;s/\n/ /g')"
-
-## Update and upgrade ##
-alias update='sudo apt-get update'
-alias upgrade='sudo apt-get upgrade'
-
-## autoclean command ##
-alias autoclean='sudo apt-get autoclean'
-
-## shorten the install command ##
-alias install='sudo apt-get install'
 
 ## open and close tor connections ##
 alias open='~/bin/tor'
 alias close='~/bin/clsetor'
 
 ## get's device connectip ips
-#alias getlocal='ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}' > ~/getlocalip.txt'
-#alais getpub='wget -qO - https://api.ipify.org > ~/pubip.txt'
+alias getpub='cat ~/pubip.txt'
 
 ##This command shuts down and restarts the sytem loading the bios ##
 alias bios='sudo systemctl reboot --firmware-setup'
@@ -176,15 +171,29 @@ alias gpu='git pull'
 alias gcl='git clone'
 
 
+
+## search google ##
+alias gle='googler'
 ## SSH ##
 alias keygen='ssh-keygen -t rsa -C'
 
 alias getzen='wget -q https://api.github.com/zen -O zen && cat zen && rm zen'
-alias reconfig='cd && git clone https://github.com/gld1982ltd/configs.git && cd configs && ./INSTALL && cd && reload'
-alias reload='clear && . ~/.bashrc'
+alias reconfig='cd && git clone https://github.com/HtmlGifted-cyber/configs.git && cd configs && ./INSTALL && cd && reload'
+alias reload='clear && cd ~/ && . ~/.bashrc'
 
     alias reboot='sudo systemctl reboot'
     alias poweroff='sudo systemctl poweroff'
     #alias update='sudo pacman -Syyu'
     #alias netctl='sudo netctl'
+
+# cd and ls in one
+cl() {
+if [ -d "$1" ]; then
+	cd "$1"
+	ls
+	else
+	echo "bash: cl: '$1': Directory not found"
+fi
+}
+
 

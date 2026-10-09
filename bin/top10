@@ -1,0 +1,5 @@
+# this script seachers google
+# for What are the top 10 best selling books right now?
+
+# command using googler.
+googler What are the top 10 best selling books right now?

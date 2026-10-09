@@ -1,0 +1,16 @@
+#!/bin/bash
+#this script is ment to check router
+# for possiable intruders.
+
+#asks for router's ip address
+echo 'Please enter ip address of the router'
+
+#reads entered ip and sets as varaible
+read varhost
+
+#finds network cidr notation..
+CIDR=$(ip addr show |grep -w inet | grep -v 127.0.0.1 | awk '{ print $2}'| cut -d "/" -f 2)
+
+#this command is used to scan entered
+#router ip addresss
+nmap $varhost/$CIDR > ~/hackstack/rtrscan-results.txt

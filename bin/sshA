@@ -1,0 +1,17 @@
+#!/bin/bash
+#This script line connects you to a successful
+#set up of a ssh server. Use this code for all 
+#machines you want to connect to the ssh share 
+#with sshfs. make sure to pay attention to where 
+#your share is and where you want it..  
+#It will create dir if it does not find it.
+
+#asks for the ip of device to ssh to
+echo 'Please enter a ip address to ssh into.' 
+
+#reads the entered ip and sets as a variable
+read varhost
+
+#takes variable and runs command for ssh to connect to the entered ip adddess.
+
+ssh "${SSH_USER:-$USER}@$varhost" -p "${SSH_PORT:-2222}"

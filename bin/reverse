@@ -1,0 +1,12 @@
+#!/bin/bash
+#this script is to create a revse connection
+# to the active connection. 
+
+#ask for ip address
+echo 'Please Enter Ip address to connect to.'
+
+#reads input varable
+read varhost
+
+#this command does a discovery of a reverse IP lookup for ip entered information
+curl -L https://api.hackertarget.com/reverseiplookup/?q=$varhost

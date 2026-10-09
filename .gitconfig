@@ -1,7 +1,6 @@
 [user]
-    email = gld1982ltd@gmail.com
-    name  = Gary DeLaney
-
+    # Set your own:  git config --global user.name "Your Name"
+    #                git config --global user.email "you@example.com"
 [alias]
     go = checkout -B
     s  = status -s

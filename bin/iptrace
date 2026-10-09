@@ -12,4 +12,4 @@ echo Please enter ip address to look up.
 read varhost
 
 #collects ip information
-sudo traceroute -4 -Inq 1 $varhost
+sudo traceroute -4 -Inq 1 $varhost > ~/hackstack/.iptrce_results.txt

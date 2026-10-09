@@ -1,174 +1,74 @@
-configs
-=======
+# configs
 
-#Main Developer - gld1982ltd - https://github.com/gld1982ltd
+Bash configuration files and a toolbox of small command-line scripts for Ubuntu / Xubuntu: shell options, a big set of time-saving aliases, and network and system helpers in `bin/`.
 
-#ubuntu branch Developer - Htmlgifted - https://github.com/htmlgifted
+**Originally created by Gary DeLaney ([@gld1982ltd](https://github.com/gld1982ltd)).**
+**Ubuntu branch extended and maintained by Jeremy A. Henry ([@HtmlGifted-cyber](https://github.com/HtmlGifted-cyber), formerly [@htmlgifted](https://github.com/htmlgifted)).**
 
+I've used and grown these files since Ubuntu 14.04. They currently run daily on Xubuntu 20.04.
 
+## Install
 
-My config files
-
-INSTALLATION
 ```bash
-git clone https://github.com/htmlgifted/configs.git && cd configs && ./INSTALL
-```
-#01/25/2015 Added two files
-#04/00/2021 Added new files and updates for alais's
-#o4/26/2021 updated this read me
-
-
-#About this project
-This project was created by me and a really good pal online (name here).
-The project was offered to me and I used it to create a fun and easy to use cli interface for ubuntu. I have been working and using these scripts since *ubuntu 14.04*
-I have updated the script for usage with the bash shell as the commands and options change from time to time. as of today's updates and changes in commands and adding more scripts.
-
-#2021 - As of these updates and changes I am using these scripts and commands on my xubuntu 18.04 system.
-
-If you like this set of config files please feel free to star the respitorie.
-
-Added Items you may want to install for use with the scripts.
-1. nmap
-2. whois
-3. traceroute
-4. curl
-5. tor
-6. 
-
-# Files
-1. .bash_profile
-2. .bashrc
-3. .bash_aliases
-4. .exports
-5. .gitconfig
-6. bin/mybey
-7. INSTALL
-8. This readme.
-
-# .bash_profile
-This file will be the first file sourced by bash when a user logs in. It sets up any system wide programs usually called upon by bash a;nd sets up the initial $PATH variable.
-
-# .bashrc
-This file is sourced by .bash_profile and is the recommended file to edit for user configuration. This file sets general bash options, command aliases, environment variables and throws a nice greeting to the user before the prompt.
-
-# .bash_aliases
-This file is sourced by .bashrc and holds all aliases for the shell. Aliases are command shortcuts set by the user. The format for an alias is simple:
-```bash
-alias shortcut='command --options'
+git clone https://github.com/HtmlGifted-cyber/configs.git && cd configs && ./INSTALL
 ```
 
-# .exports
-This file is also sourced by .bashrc and holds various environment variable to be set by the user.
+`INSTALL` copies the dotfiles and `bin/` into your home folder. **It overwrites files with the same name**, so back up your own `~/.bashrc`, `~/.bash_aliases` and the rest first. It asks before copying (use `./INSTALL -f` to skip the question).
 
-# .gitconfig
-This file holds settings for git. Set your git username and email address as well as other git settings.
+After installing, set your own Git identity. The included `.gitconfig` deliberately has none:
 
-# bin/mybey
-This file is sourced by .bashrc to show some nice system info before a greeting in your shell.
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
 
-# INSTALL
-WARNING: This file WILL OVERWRITE any of these files in your home directory when ran. Please read this script and backup your files before usage.
+Update later with the `reconfig` alias, or `cd ~/configs && ./INSTALL`.
 
-# README.md
-This file is the file you are reading!
+## What's inside
 
+| File | What it does |
+|---|---|
+| `.bashrc` | Shell options, history settings, loads the other files |
+| `.bash_profile` | Login shell setup |
+| `.bash_aliases` | Aliases and small functions: `mkalias`, `extract`, `cl` (cd + ls), apt/pacman shortcuts, `reload` |
+| `.exports` | Environment variables |
+| `.gitconfig` | Git aliases (`git lg`, `git lt`, `git s`...) and colors, with no personal identity |
 
-# Extra bin script Files/Commands
+### bin/
 
-##Tor
-start script witch starts tor.
+| Script | Purpose |
+|---|---|
+| `geoip` | Geo-locate an IP address |
+| `iptrace` | Trace and look up an IP |
+| `whoison` | See who's on the local network |
+| `openports` | List open ports on this machine |
+| `scan` / `routerscan` | nmap scans of a host or your router |
+| `myips.sh`, `authhosts.sh`, `mybey` | Show and save local and public IP addresses |
+| `traceroute`, `trcerte`, `reverse` | Route tracing and reverse DNS lookups |
+| `analystics` | Find sites sharing an analytics ID (hackertarget API) |
+| `blockip` | Block an IP with the firewall |
+| `killport` | Kill whatever is listening on a port |
+| `monitor` | Simple live system monitor |
+| `top10`, `whodoinwhat` | Top processes, who's doing what |
+| `findd` | Find duplicate files |
+| `sshA` | SSH to a host (`SSH_USER` / `SSH_PORT` override the defaults) |
+| `sshfsmount` | Mount a remote folder over SSHFS |
+| `setup_vhost.sh` | Create an Apache virtual host |
+| `seo.py` | Quick on-page SEO score for a URL (needs `requests`, `beautifulsoup4`, `lxml`) |
+| `tor`, `chrt`, `clsetor`, `exicute` | Misc helpers |
 
-##clsetor
-this script closes an active tor connection
+## Suggested packages
 
-##exicute 
-Got tired of running the exicute 
-command every time i wanted a file 
-exicutable. so yup. I made one.
+```bash
+sudo apt install nmap whois traceroute curl tor sshfs rsync
+```
 
-##chrt
-This script is to run a
-connection routing table on your active network
+Only scan networks and hosts you own or have permission to test.
 
-##openports
-Get info about remote host ports and aviod Network Administrator detection. 
+## History
 
-##traceroute
-This script is to run a trace ip address connection to you.
+- 2013-2015: original configs by Gary DeLaney; Ubuntu branch started by Jeremy (htmlgifted).
+- 2021: new `bin/` tools and alias updates for Xubuntu 18.04.
+- 2026: moved to [@HtmlGifted-cyber](https://github.com/HtmlGifted-cyber). Brought up to date with the versions in daily use: new tools (`blockip`, `killport`, `monitor`, `routerscan`, `seo.py` and more), refreshed aliases, a `.gitconfig` that no longer carries anyone's identity, and no hard-coded user paths.
 
-##iptrace
-find geographical location of any ip address.
-
-How to run this script-
-1. put in bin dir.
-2. enter line "iptrace (ipaddress to track)"
-
-##scan
-This script is meant to report pingable ip address that are not supposed to be active. 
-If active then will display outcome
-
-##whoison
-This script runs and checks for all active ips on a network then adds the list to a file called ips.txt in 
-the user dir.
-
-##mybey
-This Script is ran when a cli interface is opened displaying the technical aspects of users device.
-
-##sshfsmount
-This script line connects you to a successful set up of a ssh server. Use this code for all 
-machines you want to connect to the ssh share with sshfs. make sure to pay attention to where your share is and where you want it.. 
-It will create dir if it does not find it.
-
-##command to make alais in cli
-mkalias <name> "<command>"
-
-example - Example: mkalias rm "rm -i"
-
-# Alias commands added
-
-1.Update
-2.Upgrade
-3.autoclean
-4.close
-5.open
-6.install
-7.bios
-8.fix
-
-#Other alias commands
-
-1.Git Commands
-2.ssh commands
-ls commands
-3.package management commands
-4.safety commands - basic commands shortened
-5.Privileged access commands
-
-
-Example of how to use bin scripts.
-
-senerio - A unknown ip address is accessing your device.
-
-we will use google dns ip for this example ( 8.8.8.8 )
-
-usage - $ scan
-Output -  Please enter ip address to look up (enter 8.8.8.8 & hit enter)
-The command will then output the hopes it takes to the desitnation ip entered.
-
-usage - $ iptrace
-Output -  Please enter the ip address to trace.
-The command will the output the hops back to the enter ip address 
-
-Geoip script usage.
-Taking the second to last address on the results from the ip trace. last
-Or using thelast ip in the list. Can be done for comairing results of output. 
-
-usage - $ geoip
-output - please enter ip to scan (enter ip address from ipscan results & hit enter)
-The command will then output all information pertaining to the ip's geo location data
-
-#Message from Me.
-
-If you are having issues with commands not functioning on your system please feel to let me know.
-
-Contact me @ htmlgifted1@gmail.com
+If these help you, a star is appreciated.

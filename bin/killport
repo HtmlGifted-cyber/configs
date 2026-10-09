@@ -1,0 +1,12 @@
+#!/bin/bash
+#this script kills any entered port number
+
+
+# this command asks for the port number
+echo pleae enter the port # you wish to Terminate
+
+# this command reads enetered value
+read varhost
+
+#this command runs the kill command with entered value
+fuser -k $varhost/tcp

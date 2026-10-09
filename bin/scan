@@ -1,13 +1,13 @@
 #!/bin/bash
 #This script is meant to report pingable
 #ip address that are not supposed to be active.
-#If active then will display outcome
-
-#This finds the current ip 
-#address and sets it as base
+#If active then will display
 
 #Scan your device for all connections
-netstat -a -nte
+sudo netstat -tunlpe
+
+#exit root access
+exit
 
 #echo's finished message
 echo "scan has finished"

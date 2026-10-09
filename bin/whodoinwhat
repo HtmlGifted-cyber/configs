@@ -1,0 +1,6 @@
+#!/bin/bash
+#this command finds all logedin users
+#and what they are doing.
+
+#looks for loggedin users and what they are doing
+w

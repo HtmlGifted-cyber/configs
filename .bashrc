@@ -61,3 +61,4 @@ echo $greet
 # set the prompt
 export PS1='\n\w\n\[\e[32m\]$ \[\e[0m\]'
 
+export PATH="$HOME/.local/bin:$PATH"

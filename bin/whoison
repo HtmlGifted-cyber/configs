@@ -9,26 +9,31 @@
 #ip address that are not supposed to be active.
 #If active then will display outcome
 
+#Get base ip address (first 3 octets
+BASE=$(hostname -I | awk '{print $1}' | awk -F '.' '{ print $1"."$2"."$3;}')
+
+
 #Scan your LAN for unauthorized IPs
-IPS=$(arp -en | gawk -F'[: ]' '{ print $1}')
+IPS=$(nmap -sn $BASE.0-254 | gawk -F'[: ]' '{ print $5} { print $6}' > ~/hackstack/.nmpresults.txt)
+RESULTS=$(nmap -sn $BASE.0-254 | gawk -F'[: ]' '{ print $5} { print $6}')
 
 #places reults in a file
-echo $IPS > ~/netdevices.txt
+echo $IPS > ~/hackstack/.nmpresults.txt
 
 #echo's finished message
 echo Here is the results of your scan
 
-#Finds all active ip adresses on network
+cat ~/hackstack/.nmpresults.txt
 
 #this counts the lines used in the ips.txt file
 #then this command echo's the count
-COUNT=$(wc netdevices.txt -l)
+COUNT=$(wc ~/hackstack/.nmpresults.txt -l)
 echo $COUNT 
 
 #echo's results of scan
-echo $IPS
+echo $RESULTS
 
 #this line echo's finished running
-echo "$USER U can find these ips in netdevices.txt in $HOME"
-echo "$USER U can find these ips in ips.txt in $HOME"
+echo "$USER U can find these ips in .nmpresults.txt in $HOME/hackstack/"
+
 

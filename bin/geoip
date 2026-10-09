@@ -16,11 +16,12 @@ echo please enter ip to scan.
 read varhost
 
 
-#requests the website ip geo location.io for ip information
-curl https://api.hackertarget.com/geoip/?q=$varhost
+#requests the website ip geo location for ip information
+geoiplookup $varhost > ~/hackstack/geoipresults.txt
 
  
-
+#reads file and displays it
+cat ~/hackstack/geoipresults.txt
                             
 
 

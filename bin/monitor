@@ -1,0 +1,63 @@
+#!/bin/bash
+# TThis script will scan for system network devices, monitor changes, 
+# and display new connections. It will also allow the user to disconnect new connections if desired.
+
+
+# Function to scan for network devices
+scan_devices() {
+    # Get the current list of network devices
+    ip -o link show | awk -F': ' '{print $2}'
+}
+
+# Function to monitor new connections
+monitor_connections() {
+    local current_devices
+    local new_devices
+    local added_devices
+
+    # Initial scan
+    current_devices=$(scan_devices)
+    echo "Monitoring network devices..."
+
+    while true; do
+        sleep 5  # Wait for 5 seconds before scanning again
+        new_devices=$(scan_devices)
+
+        # Compare current and new devices
+        added_devices=$(comm -13 <(echo "$current_devices" | sort) <(echo "$new_devices" | sort))
+
+        if [ -n "$added_devices" ]; then
+            echo "New devices detected:"
+            echo "$added_devices"
+
+            # Ask user if they want to disconnect new connections
+            read -p "Do you want to disconnect the new connections? (yes/no): " answer
+            if [[ "$answer" == "yes" ]]; then
+                for device in $added_devices; do
+                    echo "Disconnecting $device..."
+                    # Replace with actual disconnect command if needed
+                    # Example: nmcli device disconnect "$device"
+                done
+            fi
+
+            # Update current devices
+            current_devices="$new_devices"
+        fi
+    done
+}
+
+# Error handling
+trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
+
+# Start monitoring
+monitor_connections
+
+# Explanation:
+
+#    The script uses ip -o link show to list network devices.
+#    It compares the current list of devices with a new scan every 5 seconds.
+#    If new devices are detected, it prompts the user to disconnect them.
+#    Error handling is implemented using a trap to catch any errors and exit gracefully.
+
+# Make sure to run this script with appropriate permissions and modify the disconnect command as needed for your environment.
+

@@ -1,0 +1,12 @@
+#!/bin/bash
+# This script adds a ip block
+# to the ufw firewall rules
+
+# asks for ip address
+echo "Please enter ip address to block"
+
+# reads the enter address
+read varhost
+
+#
+sudo ufw deny All from $varhost

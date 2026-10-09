@@ -1,0 +1,12 @@
+#!/bin/bash
+# This script is to run a
+#connection check to you
+
+#Asks for a ip to trace
+echo 'Please enter Ip to Trace.'
+
+#reads users input and sets a variable
+read varhost
+
+#Uses traceroute command to trace address
+traceroute $varhost > ~/hackstack/trcert-results.txt

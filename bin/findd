@@ -1,0 +1,19 @@
+#!/bin/bash
+# This script is to run a
+#scan of selected folder
+#for duplicate files
+
+#Asks for a folder to scan
+echo 'Please enter folder to scan.'
+
+#reads users input and sets a variable
+read varhost
+
+#tests the enter folder vaeriable
+echo $varhost
+
+#uses entered dirctory to find duplicate files
+rdfind ~/$varhost/
+
+#reads results file
+cat ~/results.txt

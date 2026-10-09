@@ -1,0 +1,13 @@
+#!/bin/bash
+#this scrip runs a analystics report for enter info
+
+#asks for search paramiter
+# Note - (enter domain or Google Analytics / Adsense ID (UA-...... / pub-......)--)
+echo 'Please enter your search paramiter. - Example - **UA-123456**'
+
+#reads the search paramiter and sets 
+# as a variable
+read $varhost
+
+#command that searches the entered info
+curl https://api.hackertarget.com/analyticslookup/?q=$varhost
