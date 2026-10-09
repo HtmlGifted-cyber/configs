@@ -56,15 +56,19 @@ printf '[user]\n    name = Your Name\n    email = you@example.com\n' > ~/.gitcon
 | `sshA` | SSH to a host (`SSH_USER` / `SSH_PORT` override the defaults) |
 | `sshfsmount` | Mount a remote folder over SSHFS |
 | `setup_vhost.sh` | Create an Apache virtual host |
-| `seo.py` | Quick on-page SEO score for a URL (needs `requests`, `beautifulsoup4`, `lxml`) |
+| `seo.py` | Quick on-page SEO score for a URL |
+| `person-search.py` | Public-web lookup for a name via Google Programmable Search (needs `GOOGLE_API_KEY` + `GOOGLE_CSE_ID`; use responsibly) |
+| `configs-deps` | Checks that everything these scripts need is installed (`configs-deps --install` installs the missing pieces) |
 | `tor`, `chrt`, `clsetor`, `exicute` | Misc helpers |
 | `hackstack/external.sh` | Used by `mybey`: space on a mounted external drive |
 
-## Suggested packages
+## What the scripts need
 
-```bash
-sudo apt install nmap whois traceroute curl tor sshfs rsync
-```
+Each script just needs its programs installed. Run `configs-deps` to see what's missing and the exact `apt install` line, or `configs-deps --install` to install them.
+
+## Adding your own scripts
+
+Put a new script in `~/bin`, then `addscript myscript` moves it into the repo and links it back. `pushconfigs "added myscript"` publishes it. The toolbox only grows: removing a link from `~/bin` never deletes a script from the repo.
 
 Only scan networks and hosts you own or have permission to test.
 

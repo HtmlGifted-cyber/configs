@@ -1,0 +1,53 @@
+#!/bin/bash
+# configs-deps - check that the programs the bin/ scripts need are installed.
+#   configs-deps            show what's missing
+#   configs-deps --install  install the missing ones with apt (asks for your password)
+# New script with a new requirement? Add it to the lists below.
+
+# command : apt package : scripts that use it
+CMDS="
+nmap:nmap:whoison routerscan openports
+traceroute:traceroute:iptrace traceroute trcerte
+curl:curl:analystics reverse
+wget:wget:mybey tor clsetor
+tor:tor:tor clsetor
+torsocks:torsocks:tor clsetor
+sshfs:sshfs:sshfsmount sshA
+ssh:openssh-client:sshfsmount sshA
+ufw:ufw:blockip
+netstat:net-tools:scan chrt
+ifconfig:net-tools:myips.sh authhosts.sh openports setup_vhost.sh
+fuser:psmisc:killport
+nmcli:network-manager:mybey monitor
+host:bind9-host:geoip openports setup_vhost.sh
+geoiplookup:geoip-bin:geoip
+rdfind:rdfind:findd
+googler:googler:top10
+a2ensite:apache2:setup_vhost.sh
+rsync:rsync:INSTALL
+"
+# python module : apt package : scripts
+PYMODS="
+requests:python3-requests:seo.py person-search.py geoip
+bs4:python3-bs4:seo.py person-search.py
+lxml:python3-lxml:seo.py
+"
+
+missing=()
+echo "Checking what the configs scripts need..."
+while IFS=: read -r cmd pkg used; do
+  [ -z "$cmd" ] && continue
+  if command -v "$cmd" >/dev/null 2>&1; then printf '  ok       %-12s\n' "$cmd"
+  else printf '  MISSING  %-12s (apt: %s)  used by: %s\n' "$cmd" "$pkg" "$used"; missing+=("$pkg"); fi
+done <<< "$CMDS"
+while IFS=: read -r mod pkg used; do
+  [ -z "$mod" ] && continue
+  if python3 -c "import $mod" 2>/dev/null; then printf '  ok       python %-6s\n' "$mod"
+  else printf '  MISSING  python %-6s (apt: %s)  used by: %s\n' "$mod" "$pkg" "$used"; missing+=("$pkg"); fi
+done <<< "$PYMODS"
+
+pkgs=$(printf '%s\n' "${missing[@]}" | sort -u | tr '\n' ' ')
+if [ -z "${pkgs// /}" ]; then echo "Everything is installed."; exit 0; fi
+echo; echo "To install the missing pieces:"; echo "  sudo apt install $pkgs"
+[ "$1" = "--install" ] && sudo apt install -y $pkgs
+exit 0

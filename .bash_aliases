@@ -207,5 +207,18 @@ pushconfigs() {
 	git -C "$d" add -A && git -C "$d" commit -m "${1:-Update configs}" && git -C "$d" push
 }
 
+# addscript <name>: move a new script from ~/bin into the repo's bin/ and link it back,
+# so it's included the next time you run pushconfigs. Scripts are only ever added.
+addscript() {
+	local d="${CONFIGS_DIR:-$HOME/configs}" f
+	for f in "$@"; do
+		f=$(basename "$f")
+		if [ -L ~/bin/"$f" ]; then echo "$f is already in the repo"; continue; fi
+		[ -f ~/bin/"$f" ] || { echo "No ~/bin/$f"; continue; }
+		[ -e "$d/bin/$f" ] && { echo "$d/bin/$f already exists - not overwriting"; continue; }
+		mv ~/bin/"$f" "$d/bin/$f" && chmod +x "$d/bin/$f" && ln -s "$d/bin/$f" ~/bin/"$f" && echo "Added $f"
+	done
+}
+
 # Machine-only aliases (paths, drives, accounts) live here and are never pushed
 [ -f ~/.bash_aliases.local ] && . ~/.bash_aliases.local
