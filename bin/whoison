@@ -1,39 +1,19 @@
 #!/bin/bash
+# whoison - list the devices answering on your local network (/24).
+# Results are saved to ~/hackstack/nmpresults.txt. Needs nmap.
+# Only scan networks you own or have permission to test.
 
-#This script runs and checks for all
-#all active ips on a network then adds
-#the list to a file called ips.txt in 
-#the user dir. Enjoy
+HS="$HOME/hackstack"; mkdir -p "$HS"
+OUT="$HS/nmpresults.txt"
 
-#This script is meant to report pingable
-#ip address that are not supposed to be active.
-#If active then will display outcome
+# Base address (first 3 octets) of this machine's main IP
+BASE=$(hostname -I | awk '{print $1}' | awk -F '.' '{ print $1"."$2"."$3 }')
+[ -z "$BASE" ] && { echo "No network address found - are you connected?"; exit 1; }
 
-#Get base ip address (first 3 octets
-BASE=$(hostname -I | awk '{print $1}' | awk -F '.' '{ print $1"."$2"."$3;}')
+echo "Scanning $BASE.0-254 ..."
+nmap -sn "$BASE.0-254" | awk '/Nmap scan report/ {print $NF}' | tr -d '()' > "$OUT"
 
-
-#Scan your LAN for unauthorized IPs
-IPS=$(nmap -sn $BASE.0-254 | gawk -F'[: ]' '{ print $5} { print $6}' > ~/hackstack/.nmpresults.txt)
-RESULTS=$(nmap -sn $BASE.0-254 | gawk -F'[: ]' '{ print $5} { print $6}')
-
-#places reults in a file
-echo $IPS > ~/hackstack/.nmpresults.txt
-
-#echo's finished message
-echo Here is the results of your scan
-
-cat ~/hackstack/.nmpresults.txt
-
-#this counts the lines used in the ips.txt file
-#then this command echo's the count
-COUNT=$(wc ~/hackstack/.nmpresults.txt -l)
-echo $COUNT 
-
-#echo's results of scan
-echo $RESULTS
-
-#this line echo's finished running
-echo "$USER U can find these ips in .nmpresults.txt in $HOME/hackstack/"
-
-
+echo "Here are the results of your scan:"
+cat "$OUT"
+echo "$(wc -l < "$OUT") devices answered."
+echo "$USER, you can find these IPs in $OUT"

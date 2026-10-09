@@ -149,6 +149,7 @@ alias open='~/bin/tor'
 alias close='~/bin/clsetor'
 
 ## get's device connectip ips
+alias getlocal='cat ~/hackstack/.localip.txt'
 alias getpub='cat ~/pubip.txt'
 
 ##This command shuts down and restarts the sytem loading the bios ##
@@ -197,3 +198,14 @@ fi
 }
 
 
+
+## Keep configs in sync with GitHub ##
+# CONFIGS_DIR = your clone of the configs repo (default ~/configs; override in ~/.bash_aliases.local)
+alias pullconfigs='git -C "${CONFIGS_DIR:-$HOME/configs}" pull --ff-only && reload'
+pushconfigs() {
+	local d="${CONFIGS_DIR:-$HOME/configs}"
+	git -C "$d" add -A && git -C "$d" commit -m "${1:-Update configs}" && git -C "$d" push
+}
+
+# Machine-only aliases (paths, drives, accounts) live here and are never pushed
+[ -f ~/.bash_aliases.local ] && . ~/.bash_aliases.local

@@ -1,30 +1,33 @@
 #!/bin/bash
 # Archbey2 by HtmlGifted
-# v 0.02
+# v 0.03 - system summary for your terminal.
+# Set MYBEY_HIDE_NETWORK=1 to hide the Wi-Fi name and IP addresses (e.g. for screenshots).
 
-colour="\e[00;32m" # Green"
-os_string=$(lsb_release -ds)
+colour="\e[00;32m" # Green
+HS="$HOME/hackstack"; mkdir -p "$HS"
+os_string=$(lsb_release -ds 2>/dev/null || grep -m1 PRETTY_NAME /etc/os-release | cut -d'"' -f2)
 date=$(date)
 host_name=$(hostname)
-d_g=$(ip route | grep default | awk '{print $3}')
-pub_ip=$(wget -qO - https://api.ipify.org; > $HOME/.pubip.txt)
-tor_pub_ip=$(cat ~/hackstack/.torpubip.txt)
-loc_ip=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}' > ~/hackstack/.localip.txt && cat ~/hackstack/.localip.txt)
-#server_ip=$(cat $HOME/hackstack/.server_ip)
-#vps_ip=$(cat $HOME/hackstack/.vps_ip)
+d_g=$(ip route | awk '/default/ {print $3; exit}')
+pub_ip=$(wget -qO - https://api.ipify.org 2>/dev/null); echo "$pub_ip" > "$HS/.pubip.txt"
+loc_ip=$(ip -4 -o addr show scope global | awk '{print $4}' | cut -d/ -f1 | tr '\n' ' '); echo "$loc_ip" > "$HS/.localip.txt"
 kernel=$(uname -r)
 arch_bit=$(uname -m)
-up_time=$(uptime | awk '{print $3}' | sed 's|,||g')
-num_packs=$(dpkg --get-selections | wc -l)
-cpu_name=$(grep 'model name' /proc/cpuinfo  | uniq | awk -F':' '{print $2}' | cut -f1 -d"@")
-ram_total=$(free -mh | grep Mem | awk '{print $2}')
-ram_used=$(free -mh | grep Mem | awk '{print ($3)}')
-ram_free=$(free -mh | grep Mem | awk '{print ($4)}')
-my_shell=$(echo $SHELL | sed 's|/bin/||g')
-external_space=$(~/hackstack/external.sh)
-home_space=$(df -h $HOME | tail -n1 | awk '{ print $3" / "$2" ("$1")"}')
-tools=$(ls -C ~/bin/)
-results_files=$(cd ~/ && ls -C | grep -v ~/$)
+up_time=$(uptime -p | sed 's/^up //')
+num_packs=$(dpkg --get-selections 2>/dev/null | wc -l)
+cpu_name=$(grep 'model name' /proc/cpuinfo | uniq | awk -F':' '{print $2}' | cut -f1 -d"@")
+ram_total=$(free -mh | awk '/Mem/ {print $2}')
+ram_used=$(free -mh | awk '/Mem/ {print $3}')
+ram_free=$(free -mh | awk '/Mem/ {print $4}')
+my_shell=$(basename "$SHELL")
+external_space=$([ -x "$HS/external.sh" ] && "$HS/external.sh")
+home_space=$(df -h "$HOME" | tail -n1 | awk '{ print $3" / "$2" ("$1")"}')
+tools=$(ls -C ~/bin/ 2>/dev/null)
+results_files=$(cd ~/ && ls -C)
+# Only the network you're connected to (not every network in range)
+network_name=$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1=="yes" {print $2; exit}')
+[ -z "$network_name" ] && network_name="(wired or not on Wi-Fi)"
+if [ "${MYBEY_HIDE_NETWORK:-0}" = 1 ]; then network_name="(hidden)"; pub_ip="(hidden)"; loc_ip="(hidden)"; d_g="(hidden)"; fi
 
 echo
 echo -e "${colour} OS:\e[00m ${os_string} ${arch_bit}"
@@ -41,16 +44,12 @@ echo -e "${colour} RAM Used:\e[00m ${ram_used}"
 echo -e "${colour} Ram Free:\e[00m ${ram_free}"
 echo -e "${colour} CPU:\e[00m${cpu_name}"
 echo -e "${colour} Public IP:\e[00m ${pub_ip}"
+echo -e "${colour} Network Name:\e[00m ${network_name}"
 echo -e "${colour} Default Gateway:\e[00m ${d_g}"
 echo -e "${colour} Local IP:\e[00m ${loc_ip}"
-#echo -e "${colour} TorPub Ip:\e[00m ${tor_pub_ip}"
-#echo -e "${colour} server IP:\e[00m ${server_ip}"
-#echo -e "${colour} vps IP:\e[00m ${vps_ip}"
 echo -e "${colour} Home Folders:"
 echo -e "${colour} \e[00m ${results_files}"
 echo -e "${colour} ----------------------------------------------------------------------------------------------------------"
 echo -e "${colour} Tools:"
 echo -e "${colour} \e[00m ${tools}"
 echo -e "${colour} ----------------------------------------------------------------------------------------------------------"
-
-echo

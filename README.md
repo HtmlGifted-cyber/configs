@@ -15,14 +15,15 @@ git clone https://github.com/HtmlGifted-cyber/configs.git && cd configs && ./INS
 
 `INSTALL` copies the dotfiles and `bin/` into your home folder. **It overwrites files with the same name**, so back up your own `~/.bashrc`, `~/.bash_aliases` and the rest first. It asks before copying (use `./INSTALL -f` to skip the question).
 
-After installing, set your own Git identity. The included `.gitconfig` deliberately has none:
+**Recommended: link instead of copy.** `./INSTALL --link` symlinks the files to your clone, so your machine and the repo are always the same files. Change something, run `pushconfigs "what changed"`, and the repo is updated (files are replaced, not duplicated). On another machine, `pullconfigs` brings the changes down.
+
+**Your own settings stay private:**
+- `~/.gitconfig.local`: your Git name and email (the shared `.gitconfig` includes it)
+- `~/.bash_aliases.local`: aliases with personal paths, drives or accounts, and `CONFIGS_DIR` (where your clone lives)
 
 ```bash
-git config --global user.name "Your Name"
-git config --global user.email "you@example.com"
+printf '[user]\n    name = Your Name\n    email = you@example.com\n' > ~/.gitconfig.local
 ```
-
-Update later with the `reconfig` alias, or `cd ~/configs && ./INSTALL`.
 
 ## What's inside
 
@@ -30,7 +31,7 @@ Update later with the `reconfig` alias, or `cd ~/configs && ./INSTALL`.
 |---|---|
 | `.bashrc` | Shell options, history settings, loads the other files |
 | `.bash_profile` | Login shell setup |
-| `.bash_aliases` | Aliases and small functions: `mkalias`, `extract`, `cl` (cd + ls), apt/pacman shortcuts, `reload` |
+| `.bash_aliases` | Aliases and functions: safety prompts (`cp -i`, `mv -i`, `rm -I`), `mkalias`, `extract`, `cl`, apt/pacman shortcuts, `reload`, `pushconfigs` / `pullconfigs` |
 | `.exports` | Environment variables |
 | `.gitconfig` | Git aliases (`git lg`, `git lt`, `git s`...) and colors, with no personal identity |
 
@@ -40,10 +41,11 @@ Update later with the `reconfig` alias, or `cd ~/configs && ./INSTALL`.
 |---|---|
 | `geoip` | Geo-locate an IP address |
 | `iptrace` | Trace and look up an IP |
-| `whoison` | See who's on the local network |
+| `whoison` | List devices on your local network (saved to `~/hackstack/nmpresults.txt`) |
 | `openports` | List open ports on this machine |
 | `scan` / `routerscan` | nmap scans of a host or your router |
-| `myips.sh`, `authhosts.sh`, `mybey` | Show and save local and public IP addresses |
+| `mybey` | System summary: OS, uptime, disk, RAM, CPU, connected network and IPs (`MYBEY_HIDE_NETWORK=1 mybey` hides network details for screenshots) |
+| `myips.sh`, `authhosts.sh` | Show and save local and public IP addresses |
 | `traceroute`, `trcerte`, `reverse` | Route tracing and reverse DNS lookups |
 | `analystics` | Find sites sharing an analytics ID (hackertarget API) |
 | `blockip` | Block an IP with the firewall |
@@ -56,6 +58,7 @@ Update later with the `reconfig` alias, or `cd ~/configs && ./INSTALL`.
 | `setup_vhost.sh` | Create an Apache virtual host |
 | `seo.py` | Quick on-page SEO score for a URL (needs `requests`, `beautifulsoup4`, `lxml`) |
 | `tor`, `chrt`, `clsetor`, `exicute` | Misc helpers |
+| `hackstack/external.sh` | Used by `mybey`: space on a mounted external drive |
 
 ## Suggested packages
 
