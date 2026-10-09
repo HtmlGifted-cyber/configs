@@ -1,13 +1,11 @@
 #!/bin/bash
-#this scrip runs a analystics report for enter info
-
-#asks for search paramiter
-# Note - (enter domain or Google Analytics / Adsense ID (UA-...... / pub-......)--)
-echo 'Please enter your search paramiter. - Example - **UA-123456**'
-
-#reads the search paramiter and sets 
-# as a variable
-read $varhost
-
-#command that searches the entered info
-curl https://api.hackertarget.com/analyticslookup/?q=$varhost
+# analystics - find other websites that share a Google Analytics / AdSense ID
+# (or the IDs a domain uses), via the free HackerTarget API.
+# Usage: analystics UA-123456  |  analystics example.com  |  analystics  (asks)
+varhost="$1"
+if [ -z "$varhost" ]; then
+  echo 'Please enter a domain or an Analytics / AdSense ID. Example: UA-123456 or pub-123456'
+  read -r varhost
+fi
+[ -z "$varhost" ] && exit 1
+curl -s "https://api.hackertarget.com/analyticslookup/?q=$varhost"; echo
