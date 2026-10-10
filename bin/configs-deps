@@ -6,7 +6,7 @@
 
 # command : apt package : scripts that use it
 CMDS="
-nmap:nmap:whoison routerscan openports
+nmap:nmap:whoison routerscan openports netwatch
 traceroute:traceroute:iptrace traceroute trcerte
 curl:curl:analystics reverse
 wget:wget:mybey tor clsetor

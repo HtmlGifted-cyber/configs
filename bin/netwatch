@@ -1,0 +1,56 @@
+#!/bin/bash
+# netwatch - security watch, run by cron every 10 minutes while the laptop is on.
+#  1. New device on the Wi-Fi/LAN: desktop alert + log (MAC address not seen before)
+#  2. New open port: desktop alert + log (a program starts accepting connections
+#     from other devices, i.e. listening on something other than 127.0.0.1/::1)
+# First run records what's normal (no alerts). Files live in ~/hackstack/.
+#   netwatch            run a check (what cron does)
+#   netwatch status     show known devices, known ports and recent alerts
+#   netwatch trust      accept everything seen right now as normal
+HS="$HOME/hackstack"; mkdir -p "$HS"
+DEV="$HS/known-devices.txt"; PORTS="$HS/known-ports.txt"; LOG="$HS/netwatch.log"
+export DISPLAY=${DISPLAY:-:0}
+export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/$(id -u)/bus}
+
+alert() {
+  echo "$(date '+%F %T') $1" >> "$LOG"
+  notify-send -u critical -i security-high "Network watch" "$1" 2>/dev/null
+}
+
+scan_devices() {
+  # Ping sweep the local /24 so the ARP table fills in, then read MAC + IP from it.
+  local base; base=$(hostname -I | awk '{print $1}' | cut -d. -f1-3)
+  [ -n "$base" ] || return 1
+  nmap -sn -n "$base.0/24" >/dev/null 2>&1
+  ip neigh show | awk '$5 ~ /:/ && $NF != "FAILED" {print $5, $1}' | sort -u
+}
+
+scan_ports() {
+  # TCP listeners only (UDP ports from discovery services change on every restart)
+  ss -tlpnH 2>/dev/null | awk '{print "tcp", $4, $6}' \
+    | grep -vE ' (127\.[0-9.]+|\[::1\]|::1|127\.0\.0\.53%lo):' \
+    | sed -E 's/,pid=[0-9]+,fd=[0-9]+//g; s/users:\(\(//; s/\)\)//' | sort -u
+}
+
+case "$1" in
+  status)
+    echo "Known devices:"; cat "$DEV" 2>/dev/null; echo
+    echo "Known open ports:"; cat "$PORTS" 2>/dev/null; echo
+    echo "Recent alerts:"; tail -n 10 "$LOG" 2>/dev/null; exit 0 ;;
+  trust)
+    scan_devices > "$DEV"; scan_ports > "$PORTS"; echo "Current devices and ports saved as normal."; exit 0 ;;
+esac
+
+if [ ! -f "$DEV" ] || [ ! -f "$PORTS" ]; then
+  scan_devices > "$DEV"; scan_ports > "$PORTS"
+  echo "$(date '+%F %T') baseline recorded: $(wc -l < "$DEV") devices, $(wc -l < "$PORTS") open ports" >> "$LOG"
+  exit 0
+fi
+
+while read -r mac ip; do
+  grep -qi "^$mac " "$DEV" || { alert "New device on your network: $ip ($mac)"; echo "$mac $ip" >> "$DEV"; }
+done < <(scan_devices)
+
+while read -r line; do
+  grep -qxF "$line" "$PORTS" || { alert "New open port: $line"; echo "$line" >> "$PORTS"; }
+done < <(scan_ports)

@@ -38,7 +38,7 @@ Open a new terminal and you're set.
   - `~/.bash_aliases.local`: aliases with personal paths, drives, servers or accounts. It's loaded automatically at the end of `.bash_aliases`.
 - **`addscript`: the toolbox only grows.** Drop a new script in `~/bin` and run `addscript myscript`. It moves the script into the repo, makes it executable, and links it back. It refuses to overwrite a script with the same name, so you never get duplicates, and removing a link from `~/bin` never deletes a script from the repo.
 - **`configs-deps`: know what each script needs.** It checks every program and Python library the scripts use, says which scripts need anything that's missing, and prints the exact `apt install` line. `configs-deps --install` installs them for you.
-- **New tools:** `blockip`, `killport`, `monitor`, `routerscan`, `reverse`, `analystics`, `findd`, `top10`, `whodoinwhat`, `myips.sh`, `authhosts.sh`, `trcerte`, `setup_vhost.sh`, `sshA`, `seo.py`, `person-search.py`, `configs-deps`, and `hackstack/external.sh`.
+- **New tools:** `netwatch`, `blockip`, `killport`, `monitor`, `routerscan`, `reverse`, `analystics`, `findd`, `top10`, `whodoinwhat`, `myips.sh`, `authhosts.sh`, `trcerte`, `setup_vhost.sh`, `sshA`, `seo.py`, `person-search.py`, `configs-deps`, and `hackstack/external.sh`.
 - **Updated tools:**
   - `mybey` v0.03 shows only the network you're connected to (it used to list every Wi-Fi network in range). `MYBEY_HIDE_NETWORK=1 mybey` hides network name and IPs for screenshots. Works without `ifconfig`, and the saved public-IP file no longer gets blanked.
   - `whoison` runs one scan instead of two and really saves the results.
@@ -95,6 +95,7 @@ Run any script by name. Most ask for what they need (an IP, a folder, a port) if
 | `scan` | Shows this computer's active connections and listening ports |
 | `chrt` | Shows your network route table |
 | `monitor` | Watches for new network interfaces appearing (USB tethering, VPN, new adapters) every 5 seconds |
+| `netwatch` | Security watch for cron: alerts (desktop + log) when a new device joins your network or a new port opens. `netwatch status`, `netwatch trust` |
 | `blockip` | Blocks an IP address in the ufw firewall |
 | `killport` | Stops whatever program is using a port |
 | `myips.sh` | Saves this computer's local IP to a file and shows it |
