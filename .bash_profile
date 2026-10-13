@@ -8,3 +8,7 @@ if [ -d "$HOME/bin" ] ; then
 fi
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/wwm/.local/bin:$PATH"
