@@ -9,6 +9,7 @@
 # Git repos: set REPOS_DIR in ~/.config/mybey/mybey.conf to the folder that holds your local
 #   GitHub repos (default: ~/Projects). Example line:  REPOS_DIR=~/code
 #   The banner shows which repos have unsaved work or commits not yet pushed (no network calls).
+#   Optional: STATUS_JSON=/path/to/status.json shows a one-line health summary ("summary" field) at the top of Running now.
 # Type `tools` for the full list of your ~/bin tools.
 
 G="\e[00;32m"; D="\e[02m"; N="\e[00m"; Y="\e[00;33m"
@@ -85,6 +86,13 @@ echo -e " ${G}CPU${N} ${cpu_name} · ${G}RAM${N} ${ram} used"
 echo -e " ${G}Disk${N} ${disks}"
 echo -e " ${G}Net${N} ${network_name} · ${loc_ip} · public ${pub_ip}"
 echo -e " ${G}── Running now ─────────────────────────────────────────────${N}"
+# optional one-line health summary from a status collector: STATUS_JSON=/path/status.json in mybey.conf
+if [ -n "${STATUS_JSON:-}" ] && [ -r "$STATUS_JSON" ]; then
+  sumline=$(python3 -c 'import json,sys,time
+d=json.load(open(sys.argv[1]))
+print(d.get("summary","") if time.time()-d.get("generated",0) < 1800 else "status is stale (collector not running?)")' "$STATUS_JSON" 2>/dev/null)
+  case "$sumline" in "All good"*) echo -e "  ${G}✔${N} $sumline";; "") ;; *) echo -e "  ${Y}⚠ $sumline${N}";; esac
+fi
 if [ ${#on[@]} -gt 0 ]; then
   line=" "; for x in "${on[@]}"; do line="$line ${G}●${N} $x  "; done; echo -e "$line"
 else echo -e "  ${D}nothing from workers.conf is running${N}"; fi
