@@ -40,6 +40,11 @@ Open a new terminal and you're set.
 - **`configs-deps`: know what each script needs.** It checks every program and Python library the scripts use, says which scripts need anything that's missing, and prints the exact `apt install` line. `configs-deps --install` installs them for you.
 - **New tools:** `netwatch`, `blockip`, `killport`, `monitor`, `routerscan`, `reverse`, `analystics`, `findd`, `top10`, `whodoinwhat`, `myips.sh`, `authhosts.sh`, `trcerte`, `setup_vhost.sh`, `sshA`, `seo.py`, `person-search.py`, `configs-deps`, and `hackstack/external.sh`.
 - **Updated tools:**
+  - `mybey` v0.04 is a compact one-screen banner with four new parts, each set in a small file in `~/.config/mybey/` (create the ones you want):
+    - **Repos:** in `mybey.conf`, set `REPOS_DIR=~/your/repos/folder` to the folder holding your local GitHub repos (default `~/Projects`). The banner then shows which repos have unsaved changes (✏️), commits not pushed yet (⬆) or are behind (⬇), plus which are local-only. It never goes online, so it stays fast.
+    - **Running now:** in `workers.conf`, one line per program to watch, `Label | proc | pattern` (process match), `Label | port | 8080` (listening port) or `Label | claude | text` (a Claude Code session whose folder or environment contains the text). Loaded Ollama AI models are shown too.
+    - **Drive names:** in `drives.conf`, `mountpoint | name` gives your external drives friendly names.
+    - **Home:** shows folders only. `tools` lists every script in `~/bin`, without backups.
   - `mybey` v0.03 shows only the network you're connected to (it used to list every Wi-Fi network in range). `MYBEY_HIDE_NETWORK=1 mybey` hides network name and IPs for screenshots. Works without `ifconfig`, and the saved public-IP file no longer gets blanked.
   - `whoison` runs one scan instead of two and really saves the results.
   - `geoip`, `iptrace`, `openports` and `scan` are refreshed to their current versions.
@@ -111,7 +116,8 @@ Run any script by name. Most ask for what they need (an IP, a folder, a port) if
 
 | Script | What it does |
 |---|---|
-| `mybey` | One-screen system summary: OS, kernel, uptime, disk (home and external), RAM, CPU, packages, connected network, IPs and your tools |
+| `mybey` | One-screen banner: system, disks, network, what is running (workers / AI models), your git repos status and home folders |
+| `tools` | Lists your scripts in ~/bin, hiding backups |
 | `whodoinwhat` | Who is logged in and what they're running |
 | `findd` | Finds duplicate files in a folder (rdfind) |
 | `exicute <file>` | Makes a file executable |
