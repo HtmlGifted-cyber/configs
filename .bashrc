@@ -69,4 +69,7 @@ export NVM_DIR="$HOME/.nvm"
 
 
 # Added by Antigravity CLI installer
-export PATH="/home/wwm/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# Composio CLI
+export PATH="$HOME/.local/bin:$PATH"
