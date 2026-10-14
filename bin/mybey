@@ -6,6 +6,9 @@
 #   Label | proc   | pgrep -f pattern
 #   Label | port   | TCP port listening on this machine
 #   Label | claude | text that must appear in a running claude process's working dir or environment
+# Git repos: set REPOS_DIR in ~/.config/mybey/mybey.conf to the folder that holds your local
+#   GitHub repos (default: ~/Projects). Example line:  REPOS_DIR=~/code
+#   The banner shows which repos have unsaved work or commits not yet pushed (no network calls).
 # Type `tools` for the full list of your ~/bin tools.
 
 G="\e[00;32m"; D="\e[02m"; N="\e[00m"; Y="\e[00;33m"
@@ -55,6 +58,23 @@ models=$(curl -s -m 1 http://127.0.0.1:11434/api/ps 2>/dev/null | python3 -c 'im
 try: print(", ".join(m["name"] for m in json.load(sys.stdin).get("models",[])))
 except Exception: pass' 2>/dev/null)
 
+# --- git repos under REPOS_DIR: unsaved work / not pushed (local check only, no fetch) ---
+REPOS_DIR="$HOME/Projects"
+[ -r "$HOME/.config/mybey/mybey.conf" ] && . "$HOME/.config/mybey/mybey.conf"
+REPOS_DIR="${REPOS_DIR/#\~/$HOME}"
+nrepos=0; attn=(); localonly=()
+for g in "$REPOS_DIR"/*/.git; do
+  [ -d "$g" ] || continue
+  r=$(dirname "$g"); n=$(basename "$r"); nrepos=$((nrepos + 1)); s=""
+  [ -n "$(git -C "$r" status --porcelain 2>/dev/null | head -1)" ] && s="✏️"
+  if git -C "$r" rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1; then
+    a=$(git -C "$r" rev-list --count '@{u}..HEAD' 2>/dev/null); b=$(git -C "$r" rev-list --count 'HEAD..@{u}' 2>/dev/null)
+    [ "${a:-0}" -gt 0 ] && s="$s⬆${a}"; [ "${b:-0}" -gt 0 ] && s="$s⬇${b}"
+  elif [ -z "$(git -C "$r" remote 2>/dev/null)" ]; then localonly+=("$n")
+  fi
+  [ -n "$s" ] && attn+=("$n $s")
+done
+
 # --- home: folders only (loose files and hidden items stay out of the way) ---
 folders=$(cd ~ && ls -d */ 2>/dev/null | tr -d '/' | grep -vx -e snap -e bin -e hackstack -e __pycache__ | tr '\n' ' ')
 ntools=$(find ~/bin ~/.local/bin -maxdepth 1 \( -type f -o -type l \) -perm -u+x 2>/dev/null | grep -vc '\.bak')
@@ -70,6 +90,15 @@ if [ ${#on[@]} -gt 0 ]; then
 else echo -e "  ${D}nothing from workers.conf is running${N}"; fi
 [ -n "$models" ] && echo -e "  ${Y}AI models loaded:${N} $models"
 [ ${#off[@]} -gt 0 ] && echo -e "  ${D}off: $(IFS=,; echo "${off[*]}" | sed 's/,/, /g')${N}"
+if [ "$nrepos" -gt 0 ]; then
+  short="${REPOS_DIR/#$HOME/\~}"
+  echo -e " ${G}── Repos (${short}) ───────────────────────────────────────${N}"
+  if [ ${#attn[@]} -gt 0 ]; then
+    echo -e "  $((nrepos - ${#attn[@]})) of ${nrepos} up to date · ${Y}$(IFS=,; echo "${attn[*]}" | sed 's/,/ · /g')${N}"
+    echo -e "  ${D}✏️ unsaved changes  ⬆ commits to push  ⬇ behind (as of last fetch)${N}"
+  else echo -e "  all ${nrepos} repos up to date"; fi
+  [ ${#localonly[@]} -gt 0 ] && echo -e "  ${D}local only (no GitHub yet): $(IFS=,; echo "${localonly[*]}" | sed 's/,/, /g')${N}"
+fi
 echo -e " ${G}── Home ────────────────────────────────────────────────────${N}"
 echo -e "  ${folders}"
 echo -e " ${D} ${ntools} tools ready · type 'tools' to list them${N}"
