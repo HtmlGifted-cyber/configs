@@ -1,55 +1,76 @@
 #!/bin/bash
 # Archbey2 by HtmlGifted
-# v 0.03 - system summary for your terminal.
+# v 0.04 - compact system summary for your terminal: system, what's running, home folders.
 # Set MYBEY_HIDE_NETWORK=1 to hide the Wi-Fi name and IP addresses (e.g. for screenshots).
+# Workers/AI shown under "Running now" come from ~/.config/mybey/workers.conf (one per line):
+#   Label | proc   | pgrep -f pattern
+#   Label | port   | TCP port listening on this machine
+#   Label | claude | text that must appear in a running claude process's working dir or environment
+# Type `tools` for the full list of your ~/bin tools.
 
-colour="\e[00;32m" # Green
+G="\e[00;32m"; D="\e[02m"; N="\e[00m"; Y="\e[00;33m"
 HS="$HOME/hackstack"; mkdir -p "$HS"
+CONF="$HOME/.config/mybey/workers.conf"
+
 os_string=$(lsb_release -ds 2>/dev/null || grep -m1 PRETTY_NAME /etc/os-release | cut -d'"' -f2)
-date=$(date)
-host_name=$(hostname)
-d_g=$(ip route | awk '/default/ {print $3; exit}')
-pub_ip=$(wget -qO - https://api.ipify.org 2>/dev/null); echo "$pub_ip" > "$HS/.pubip.txt"
-loc_ip=$(ip -4 -o addr show scope global | awk '{print $4}' | cut -d/ -f1 | tr '\n' ' '); echo "$loc_ip" > "$HS/.localip.txt"
-kernel=$(uname -r)
-arch_bit=$(uname -m)
-up_time=$(uptime -p | sed 's/^up //')
-num_packs=$(dpkg --get-selections 2>/dev/null | wc -l)
-cpu_name=$(grep 'model name' /proc/cpuinfo | uniq | awk -F':' '{print $2}' | cut -f1 -d"@")
-ram_total=$(free -mh | awk '/Mem/ {print $2}')
-ram_used=$(free -mh | awk '/Mem/ {print $3}')
-ram_free=$(free -mh | awk '/Mem/ {print $4}')
-my_shell=$(basename "$SHELL")
-external_space=$([ -x "$HS/external.sh" ] && "$HS/external.sh")
-home_space=$(df -h "$HOME" | tail -n1 | awk '{ print $3" / "$2" ("$1")"}')
-tools=$(ls -C ~/bin/ 2>/dev/null)
-results_files=$(cd ~/ && ls -C)
-# Only the network you're connected to (not every network in range)
+up_time=$(uptime -p | sed 's/^up //; s/ hours\?/h/; s/ minutes\?/m/; s/ days\?/d/; s/,//g')
+cpu_name=$(grep -m1 'model name' /proc/cpuinfo | awk -F': ' '{print $2}' | sed 's/ with .*//; s/(R)//g; s/(TM)//g')
+ram=$(free -h | awk '/Mem/ {print $3" of "$2}')
+disk() { df -h --output=used,size "$1" 2>/dev/null | tail -1 | awk '{print $1"/"$2}'; }
+disks="home $(disk "$HOME")"
+for m in /media/"$USER"/* /mnt/*; do
+  [ -d "$m" ] && mountpoint -q "$m" || continue
+  # friendly names from ~/.config/mybey/drives.conf ("mountpoint | name"), else the drive size
+  name=$(awk -F'|' -v m="$m" '{gsub(/^[ \t]+|[ \t]+$/,"",$1); gsub(/^[ \t]+|[ \t]+$/,"",$2)} $1==m {print $2}' "$HOME/.config/mybey/drives.conf" 2>/dev/null)
+  [ -z "$name" ] && name="$(df -h --output=size "$m" | tail -1 | tr -d ' ') drive"
+  disks="$disks · ${name} $(disk "$m")"
+done
+pub_ip=$(wget -qO - -T 3 https://api.ipify.org 2>/dev/null); echo "$pub_ip" > "$HS/.pubip.txt"
+loc_ip=$(ip -4 -o addr show scope global | awk '{print $4}' | cut -d/ -f1 | head -1); echo "$loc_ip" > "$HS/.localip.txt"
 network_name=$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1=="yes" {print $2; exit}')
-[ -z "$network_name" ] && network_name="(wired or not on Wi-Fi)"
-if [ "${MYBEY_HIDE_NETWORK:-0}" = 1 ]; then network_name="(hidden)"; pub_ip="(hidden)"; loc_ip="(hidden)"; d_g="(hidden)"; fi
+[ -z "$network_name" ] && network_name="wired / no Wi-Fi"
+if [ "${MYBEY_HIDE_NETWORK:-0}" = 1 ]; then network_name="(hidden)"; pub_ip="(hidden)"; loc_ip="(hidden)"; fi
+
+# --- what's running ---
+claude_pids=$(pgrep -x claude)
+is_running() { # type pattern
+  case "$1" in
+    proc)   pgrep -f -- "$2" >/dev/null ;;
+    port)   ss -ltn 2>/dev/null | awk '{print $4}' | grep -q ":$2\$" ;;
+    claude) for p in $claude_pids; do
+              { readlink "/proc/$p/cwd"; tr '\0' '\n' < "/proc/$p/environ"; } 2>/dev/null | grep -q -- "$2" && return 0
+            done; return 1 ;;
+  esac
+}
+on=(); off=()
+if [ -r "$CONF" ]; then
+  while IFS='|' read -r label type pat; do
+    trim() { sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<<"$1"; }
+    label=$(trim "$label"); type=$(trim "$type"); pat=$(trim "$pat")
+    { [ -z "$label" ] || [ "${label:0:1}" = "#" ]; } && continue
+    if is_running "$type" "$pat"; then on+=("$label"); else off+=("$label"); fi
+  done < "$CONF"
+fi
+models=$(curl -s -m 1 http://127.0.0.1:11434/api/ps 2>/dev/null | python3 -c 'import json,sys
+try: print(", ".join(m["name"] for m in json.load(sys.stdin).get("models",[])))
+except Exception: pass' 2>/dev/null)
+
+# --- home: folders only (loose files and hidden items stay out of the way) ---
+folders=$(cd ~ && ls -d */ 2>/dev/null | tr -d '/' | grep -vx -e snap -e bin -e hackstack -e __pycache__ | tr '\n' ' ')
+ntools=$(find ~/bin ~/.local/bin -maxdepth 1 \( -type f -o -type l \) -perm -u+x 2>/dev/null | grep -vc '\.bak')
 
 echo
-echo -e "${colour} OS:\e[00m ${os_string} ${arch_bit}"
-echo -e "${colour} Date:\e[00m ${date}"
-echo -e "${colour} Hostname:\e[00m ${host_name}"
-echo -e "${colour} Kernel:\e[00m ${kernel}"
-echo -e "${colour} Shell:\e[00m ${my_shell}"
-echo -e "${colour} Uptime:\e[00m ${up_time}"
-echo -e "${colour} Home:\e[00m ${home_space}"
-echo -e "${colour} External:\e[00m ${external_space}"
-echo -e "${colour} Packages:\e[00m ${num_packs}"
-echo -e "${colour} Ram Total:\e[00m ${ram_total}"
-echo -e "${colour} RAM Used:\e[00m ${ram_used}"
-echo -e "${colour} Ram Free:\e[00m ${ram_free}"
-echo -e "${colour} CPU:\e[00m${cpu_name}"
-echo -e "${colour} Public IP:\e[00m ${pub_ip}"
-echo -e "${colour} Network Name:\e[00m ${network_name}"
-echo -e "${colour} Default Gateway:\e[00m ${d_g}"
-echo -e "${colour} Local IP:\e[00m ${loc_ip}"
-echo -e "${colour} Home Folders:"
-echo -e "${colour} \e[00m ${results_files}"
-echo -e "${colour} ----------------------------------------------------------------------------------------------------------"
-echo -e "${colour} Tools:"
-echo -e "${colour} \e[00m ${tools}"
-echo -e "${colour} ----------------------------------------------------------------------------------------------------------"
+echo -e " ${G}${os_string}${N} · up ${up_time} · $(date '+%a %b %-d, %-I:%M %p')"
+echo -e " ${G}CPU${N} ${cpu_name} · ${G}RAM${N} ${ram} used"
+echo -e " ${G}Disk${N} ${disks}"
+echo -e " ${G}Net${N} ${network_name} · ${loc_ip} · public ${pub_ip}"
+echo -e " ${G}── Running now ─────────────────────────────────────────────${N}"
+if [ ${#on[@]} -gt 0 ]; then
+  line=" "; for x in "${on[@]}"; do line="$line ${G}●${N} $x  "; done; echo -e "$line"
+else echo -e "  ${D}nothing from workers.conf is running${N}"; fi
+[ -n "$models" ] && echo -e "  ${Y}AI models loaded:${N} $models"
+[ ${#off[@]} -gt 0 ] && echo -e "  ${D}off: $(IFS=,; echo "${off[*]}" | sed 's/,/, /g')${N}"
+echo -e " ${G}── Home ────────────────────────────────────────────────────${N}"
+echo -e "  ${folders}"
+echo -e " ${D} ${ntools} tools ready · type 'tools' to list them${N}"
+echo -e " ${G}────────────────────────────────────────────────────────────${N}"
