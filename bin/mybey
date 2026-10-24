@@ -7,7 +7,7 @@
 #   Label | port   | TCP port listening on this machine
 #   Label | claude | text that must appear in a running claude process's working dir or environment
 # Git repos: set REPOS_DIR in ~/.config/mybey/mybey.conf to the folder that holds your local
-#   GitHub repos (default: ~/Projects). Example line:  REPOS_DIR=~/code
+#   GitHub repos (default: ~/Documents/Projects). Example line:  REPOS_DIR=~/code
 #   The banner shows which repos have unsaved work or commits not yet pushed (no network calls).
 #   Optional: STATUS_JSON=/path/to/status.json shows a one-line health summary ("summary" field) at the top of Running now.
 # Type `tools` for the full list of your ~/bin tools.
@@ -60,7 +60,7 @@ try: print(", ".join(m["name"] for m in json.load(sys.stdin).get("models",[])))
 except Exception: pass' 2>/dev/null)
 
 # --- git repos under REPOS_DIR: unsaved work / not pushed (local check only, no fetch) ---
-REPOS_DIR="$HOME/Projects"
+REPOS_DIR="$HOME/Documents/Projects"
 [ -r "$HOME/.config/mybey/mybey.conf" ] && . "$HOME/.config/mybey/mybey.conf"
 REPOS_DIR="${REPOS_DIR/#\~/$HOME}"
 nrepos=0; attn=(); localonly=()

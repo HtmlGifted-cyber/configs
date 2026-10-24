@@ -41,7 +41,7 @@ Open a new terminal and you're set.
 - **New tools:** `netwatch`, `blockip`, `killport`, `monitor`, `routerscan`, `reverse`, `analystics`, `findd`, `top10`, `whodoinwhat`, `myips.sh`, `authhosts.sh`, `trcerte`, `setup_vhost.sh`, `sshA`, `seo.py`, `person-search.py`, `configs-deps`, and `hackstack/external.sh`.
 - **Updated tools:**
   - `mybey` v0.04 is a compact one-screen banner with four new parts, each set in a small file in `~/.config/mybey/` (create the ones you want):
-    - **Repos:** in `mybey.conf`, set `REPOS_DIR=~/your/repos/folder` to the folder holding your local GitHub repos (default `~/Projects`). The banner then shows which repos have unsaved changes (✏️), commits not pushed yet (⬆) or are behind (⬇), plus which are local-only. It never goes online, so it stays fast.
+    - **Repos:** in `mybey.conf`, set `REPOS_DIR=~/your/repos/folder` to the folder holding your local GitHub repos (default `~/Documents/Projects`). The banner then shows which repos have unsaved changes (✏️), commits not pushed yet (⬆) or are behind (⬇), plus which are local-only. It never goes online, so it stays fast.
     - **Running now:** in `workers.conf`, one line per program to watch, `Label | proc | pattern` (process match), `Label | port | 8080` (listening port) or `Label | claude | text` (a Claude Code session whose folder or environment contains the text). Loaded Ollama AI models are shown too.
     - **Drive names:** in `drives.conf`, `mountpoint | name` gives your external drives friendly names.
     - **Home:** shows folders only. `tools` lists every script in `~/bin`, without backups.
