@@ -15,3 +15,4 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Composio CLI
 export PATH="$HOME/.local/bin:$PATH"
+. "$HOME/.cargo/env"
